@@ -5,7 +5,7 @@ android {
     buildToolsVersion "30.0.2"
 
     defaultConfig {
-        applicationId "org.pytorch.demo.objectdetection"
+        applicationId "org.cv4.agriculture.vision"
         minSdkVersion 28
         targetSdkVersion 30
         versionCode 1

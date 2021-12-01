@@ -1,4 +1,4 @@
-package org.pytorch.demo.objectdetection;
+package org.cv4.agriculture.vision.imagesegmentation;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
