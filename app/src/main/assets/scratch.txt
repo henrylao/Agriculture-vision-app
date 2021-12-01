@@ -1,0 +1,11 @@
+background
+cloud_shadow
+double_plant
+planter_skip
+standing_water
+waterway
+weed_cluster
+drydown
+endrow
+nutrient_deficiency
+stormdamage
