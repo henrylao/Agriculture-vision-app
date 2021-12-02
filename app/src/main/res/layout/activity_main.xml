@@ -162,6 +162,7 @@
 
             <TextView
                 android:layout_margin="5dp"
+                android:padding="2dp"
                 android:background="@color/water"
                 android:text="water">
 
@@ -169,6 +170,7 @@
 
             <TextView
                 android:layout_margin="5dp"
+                android:padding="2dp"
                 android:background="@color/doublePlant"
                 android:text="double plant">
 
@@ -176,6 +178,7 @@
 
             <TextView
                 android:layout_margin="5dp"
+                android:padding="2dp"
                 android:background="@color/planterSkip"
                 android:text="planter skip">
 
@@ -190,6 +193,7 @@
 
             <TextView
                 android:layout_margin="5dp"
+                android:padding="2dp"
                 android:background="@color/drydown"
                 android:text="drydown"
                 android:textColor="@android:color/white"
@@ -200,6 +204,7 @@
 
             <TextView
                 android:layout_margin="5dp"
+                android:padding="2dp"
                 android:background="@color/waterway"
 
                 android:text="waterway">
@@ -208,6 +213,7 @@
 
             <TextView
                 android:layout_margin="5dp"
+                android:padding="2dp"
                 android:background="@color/weedCluster"
                 android:text="weed cluster">
 
@@ -227,6 +233,7 @@
 
             <TextView
                 android:layout_margin="5dp"
+                android:padding="2dp"
                 android:background="@color/endrow"
                 android:text="endrow"
                 android:textColor="@android:color/white"
@@ -237,6 +244,7 @@
 
             <TextView
                 android:layout_margin="5dp"
+                android:padding="2dp"
                 android:background="@color/nutrientDeficiency"
                 android:text="nutrient deficiency"
                 android:textColor="@android:color/white">
@@ -245,6 +253,7 @@
 
             <TextView
                 android:layout_margin="5dp"
+                android:padding="2dp"
                 android:background="@color/stormDamage"
                 android:text="storm damage">
 
@@ -257,6 +266,7 @@
 
             <TextView
                 android:layout_margin="5dp"
+                android:padding="2dp"
                 android:background="@color/background"
                 android:text="background"
                 android:textColor="@android:color/white">
