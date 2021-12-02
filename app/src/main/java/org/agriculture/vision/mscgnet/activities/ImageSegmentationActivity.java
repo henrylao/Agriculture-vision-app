@@ -23,9 +23,12 @@ import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -44,9 +47,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class ImageSegmentationActivity extends AppCompatActivity implements Runnable {
+public class ImageSegmentationActivity extends AppCompatActivity implements Runnable,
+//        View.OnClickListener,
+        AdapterView.OnItemSelectedListener {
     private static final String TAG = "MainActivity";
     private int mImageIndex = 0;
+    private Spinner modeSpinner;
+    private ImageView mImageView;
+    private ResultView mResultView;
+    private int overlayMode = 0;
+    private Button mButtonDetect, mButtonSegment;
+    private ProgressBar mProgressBar;
+    private float mImgScaleX, mImgScaleY, mIvScaleX, mIvScaleY, mStartX, mStartY;
+
     public static final String inputBasename = "input.jpg";
     public static final String lutRGBBasename = "lut_rgb.png";
     public static final String lutBasename = "lut.png";
@@ -57,7 +70,7 @@ public class ImageSegmentationActivity extends AppCompatActivity implements Runn
     private Module mModule = null;
     private static final int CLASSNUM = 10;
 
-    // Label codes
+    // Label encoding
     public static final int BACKGROUND = 0;
     public static final int WATER = 1;
     public static final int DOUBLE_PLANT = 2;
@@ -69,6 +82,7 @@ public class ImageSegmentationActivity extends AppCompatActivity implements Runn
     public static final int NUTRIENT_DEFICIENT = 8;
     public static final int STORM_DAMAGE = 9;
 
+    // colors in HEX to be deferenced by the associated encoded label
     public static final int[] COLOR_MAP = {
             0xFFFFFF00, // water
             0xFFFF00FF, // double plant
@@ -81,20 +95,8 @@ public class ImageSegmentationActivity extends AppCompatActivity implements Runn
             0xFFFF0000 // storm damage
     };
 
-//    private String[] mTestInputImages = {
-//            "1E3FJWUF1_3911-3514-4423-4026",
-//            "1FY8MBG8K_3050-1017-3562-1529",
-//            "1FY8MBG8K_3645-665-4157-1177",
-//            "1FY8MBG8K_10140-9620-10652-10132",
-//            "1KK6Y8UVT_10337-3853-10849-4365",
-//            "1KK6Y8UVT_11917-3225-12429-3737",
-//            "1KK6Y8UVT_12429-3225-12941-3737",
-//            "1NEDW647M_1011-7250-1523-7762",
-//            "1NEDW647M_1020-9073-1532-9585"
-//    };
 
     // need color code of labels
-
     private final String[] lutRGBImages = {
             "mscg-samples/1E3FJWUF1_3911-3514-4423-4026" + "/" + lutRGBBasename,
             "mscg-samples/1FY8MBG8K_3050-1017-3562-1529" + "/" + lutRGBBasename,
@@ -130,17 +132,21 @@ public class ImageSegmentationActivity extends AppCompatActivity implements Runn
             "mscg-samples/1NEDW647M_1011-7250-1523-7762" + "/" + inputBasename,
             "mscg-samples/1NEDW647M_1020-9073-1532-9585" + "/" + inputBasename,
     };
-
+//    private String[] sampleDirectories = {
+//            "1E3FJWUF1_3911-3514-4423-4026",
+//            "1FY8MBG8K_3050-1017-3562-1529",
+//            "1FY8MBG8K_3645-665-4157-1177",
+//            "1FY8MBG8K_10140-9620-10652-10132",
+//            "1KK6Y8UVT_10337-3853-10849-4365",
+//            "1KK6Y8UVT_11917-3225-12429-3737",
+//            "1KK6Y8UVT_12429-3225-12941-3737",
+//            "1NEDW647M_1011-7250-1523-7762",
+//            "1NEDW647M_1020-9073-1532-9585"
+//    };
 
 //    private String[] mTestImages = {
 //            "test1.png", "test2.jpg", "test3.png"
 //    }
-
-    private ImageView mImageView;
-    private ResultView mResultView;
-    private Button mButtonDetect, mButtonSegment;
-    private ProgressBar mProgressBar;
-    private float mImgScaleX, mImgScaleY, mIvScaleX, mIvScaleY, mStartX, mStartY;
 
 
     public static String assetFilePath(Context context, String assetName) throws IOException {
@@ -176,6 +182,8 @@ public class ImageSegmentationActivity extends AppCompatActivity implements Runn
         }
 
         setContentView(R.layout.activity_main);
+        modeSpinner = findViewById(R.id.displayModeSpinner);
+        modeSpinner.setOnItemSelectedListener(this);
 
         try {
             mBitmap = BitmapFactory.decodeStream(getAssets().open(mTestInputImages[mImageIndex]));
@@ -243,6 +251,30 @@ public class ImageSegmentationActivity extends AppCompatActivity implements Runn
             }
         });
 
+        final Button reloadTestImage = findViewById(R.id.reloadButton);
+        reloadTestImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mResultView.setVisibility(View.INVISIBLE);
+//                mImageIndex = (mImageIndex + 1) % mTestInputImages.length;
+//                buttonNextTestImage.setText(
+//                        String.format("Test Image %d/%d", mImageIndex + 1, mTestInputImages.length)
+//                );
+
+                try {
+                    mBitmap = BitmapFactory.decodeStream(
+                            getAssets().open(mTestInputImages[mImageIndex])
+                    );
+                    // display input image
+                    mImageView.setImageBitmap(mBitmap);
+                } catch (IOException e) {
+                    Log.e("Object Detection", "Error reading assets", e);
+                    finish();
+                }
+            }
+        });
+
+
         final Button buttonColorSegments = findViewById(R.id.segmentButton);
         buttonColorSegments.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -261,20 +293,28 @@ public class ImageSegmentationActivity extends AppCompatActivity implements Runn
                             // access cached rendering of RGB rendering of model's LUT output
                             getAssets().open(lutRGBImages[mImageIndex])
                     );
-                    // remove render
-                    Bitmap litRGBTransparent = null;
-//                    litRGBTransparent = createTransparentBitmapFromBitmap(lutRGB, 0xFF000000);
-//                    lutRGBOverlayedImage = overlay(mBitmap, lutRGB);
+                    // LUT only
+                    if (overlayMode == 0) {
+                        mImageView.setImageBitmap(lutRGB);
+                    }
+                    // LUT to black-rm LUT + input image
+                    else if (overlayMode == 1) {
+                        // remove black
+                        Bitmap litRGBTransparent = null;
+                        litRGBTransparent = createTransparentBitmapFromBitmap(lutRGB, 0xFF000000);
+                        lutRGBOverlayedImage = overlay(mBitmap, litRGBTransparent);
+                        // display cached RGB rendered segmentation
+                        mImageView.setImageBitmap(lutRGBOverlayedImage);
+                    }
 
                     // TODO: breaking rendering of segmentation
 //                    Thread thread = new Thread(ImageSegmentationActivity.this);
 //                    thread.start();
 
-                    // display cached RGB rendered segmentation
-//                    mImageView.setImageBitmap(lutRGBOverlayedImage);
+
                     // show only lutRGB
 //                    mImageView.setImageBitmap(litRGBTransparent);
-                    mImageView.setImageBitmap(lutRGB);
+
 
                 } catch (IOException e) {
                     Log.e("Object Detection", "Error reading assets", e);
@@ -562,6 +602,26 @@ public class ImageSegmentationActivity extends AppCompatActivity implements Runn
         bmp1.recycle();
         bmp2.recycle();
         return bmOverlay;
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+        // base call to handle for CPU,GPU
+//        super.onItemSelected(parent, view, pos, id);
+        // handle for update
+        if (parent == modeSpinner) {
+            String mode = String.valueOf(parent.getItemAtPosition(pos).toString());
+            if (mode.equals("transparent-overlay")) {
+                overlayMode = 1;
+            } else if (mode.equals("non-transparent")) {
+                overlayMode = 0;
+            }
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+        // Do nothing
     }
 
 }
