@@ -92,3 +92,6 @@ lint/tmp/
 
 # Android Profiling
 *.hprof
+
+# Lint model weights
+*.ptl
