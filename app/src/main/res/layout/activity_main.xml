@@ -4,25 +4,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.agriculture.vision.mscgnet.activities.ImageSegmentationActivity">
+    tools:context="org.agriculture.vision.mscgnet.activities.image.segmentation.ImageSegmentationActivity">
 
     <androidx.appcompat.widget.AppCompatSpinner
         android:id="@+id/displayModeSpinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:background="?android:attr/textColorHighlight"
         android:backgroundTint="@android:color/darker_gray"
         android:entries="@array/displayModes"
         android:textAlignment="textEnd"
-        android:visibility="visible"/>
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="20dp"
         android:background="#FFFFFF"
         android:contentDescription="@string/image_view"
         app:layout_constraintDimensionRatio="1:1"
@@ -44,26 +44,28 @@
         android:id="@+id/detectButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="20dp"
         android:text="@string/detect"
         android:textAllCaps="false"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintStart_toEndOf="@+id/segmentButton"
+        app:layout_constraintTop_toBottomOf="@+id/liveButton" />
 
 
     <Button
         android:id="@+id/segmentButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="5dp"
         android:text="@string/segment"
         android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/selectButton" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -80,23 +82,24 @@
         android:id="@+id/testButton"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="175dp"
         android:textAllCaps="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/selectButton"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/detectButton" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
     <Button
         android:id="@+id/reloadButton"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="20dp"
         android:text="@string/reload"
         android:textAllCaps="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/selectButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/segmentButton"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/testButton" />
@@ -123,5 +126,146 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/selectButton"
         app:layout_constraintTop_toTopOf="@+id/selectButton" />
+
+    <TextView
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        android:text="Classes"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@id/imageView"
+        app:layout_constraintStart_toStartOf="@id/imageView"
+        app:layout_constraintTop_toBottomOf="@id/imageView"
+        app:layout_constraintBottom_toTopOf="@id/labelsColorTable"
+        >
+
+    </TextView>
+
+    <TableLayout
+        android:id="@+id/labelsColorTable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:gravity="center"
+        android:stretchColumns="3"
+        app:layout_constraintBottom_toTopOf="@id/selectButton"
+        app:layout_constraintLeft_toLeftOf="@id/imageView"
+        app:layout_constraintRight_toRightOf="@id/imageView"
+        app:layout_constraintTop_toBottomOf="@+id/imageView">
+
+        <TableRow
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_margin="5dp"
+                android:background="@color/water"
+                android:text="water">
+
+            </TextView>
+
+            <TextView
+                android:layout_margin="5dp"
+                android:background="@color/doublePlant"
+                android:text="double plant">
+
+            </TextView>
+
+            <TextView
+                android:layout_margin="5dp"
+                android:background="@color/planterSkip"
+                android:text="planter skip">
+
+            </TextView>
+        </TableRow>
+
+        <TableRow
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <TextView
+                android:layout_margin="5dp"
+                android:background="@color/drydown"
+                android:text="drydown"
+                android:textColor="@android:color/white"
+
+                >
+
+            </TextView>
+
+            <TextView
+                android:layout_margin="5dp"
+                android:background="@color/waterway"
+
+                android:text="waterway">
+
+            </TextView>
+
+            <TextView
+                android:layout_margin="5dp"
+                android:background="@color/weedCluster"
+                android:text="weed cluster">
+
+            </TextView>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </TableRow>
+
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_margin="5dp"
+                android:background="@color/endrow"
+                android:text="endrow"
+                android:textColor="@android:color/white"
+
+                >
+
+            </TextView>
+
+            <TextView
+                android:layout_margin="5dp"
+                android:background="@color/nutrientDeficiency"
+                android:text="nutrient deficiency"
+                android:textColor="@android:color/white">
+
+            </TextView>
+
+            <TextView
+                android:layout_margin="5dp"
+                android:background="@color/stormDamage"
+                android:text="storm damage">
+
+            </TextView>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_margin="5dp"
+                android:background="@color/background"
+                android:text="background"
+                android:textColor="@android:color/white">
+
+            </TextView>
+
+
+        </TableRow>
+
+    </TableLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

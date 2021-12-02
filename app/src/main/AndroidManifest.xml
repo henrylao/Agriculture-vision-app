@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="org.agriculture.vision.mscgnet.activities.ImageSegmentationActivity"
+        <activity android:name="org.agriculture.vision.mscgnet.activities.image.segmentation.ImageSegmentationActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="org.agriculture.vision.mscgnet.activities.image.segmentation.ObjectDetectionActivity"
+            android:name="org.agriculture.vision.mscgnet.activities.object.detection.ObjectDetectionActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
         </activity>

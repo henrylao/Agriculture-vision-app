@@ -3,4 +3,15 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+
+    <color name="water">#FFFF00</color>
+    <color name="doublePlant">#FF00FF</color>
+    <color name="planterSkip">#00FF00</color>
+    <color name="drydown">#0000FF</color>
+    <color name="waterway">#FFFFFF</color>
+    <color name="weedCluster">#00FFFF</color>
+    <color name="endrow">#0080FF</color>
+    <color name="nutrientDeficiency">#800080</color>
+    <color name="stormDamage">#FF0000</color>
+    <color name="background">#000000</color>
 </resources>
