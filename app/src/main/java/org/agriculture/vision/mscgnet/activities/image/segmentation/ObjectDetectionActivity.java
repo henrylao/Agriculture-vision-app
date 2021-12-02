@@ -1,4 +1,4 @@
-package org.pytorch.demo.objectdetection;
+package org.agriculture.vision.mscgnet.activities.image.segmentation;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,6 +15,12 @@ import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 import androidx.camera.core.ImageProxy;
 
+import org.agriculture.vision.mscgnet.R;
+//import org.agriculture.vision.mscgnet.Result;
+import org.agriculture.vision.mscgnet.activities.ImageSegmentationActivity;
+import org.agriculture.vision.mscgnet.activities.object.detection.processing.PrePostProcessor;
+import org.agriculture.vision.mscgnet.activities.object.detection.processing.Result;
+import org.agriculture.vision.mscgnet.activities.object.detection.processing.ResultView;
 import org.pytorch.IValue;
 import org.pytorch.LiteModuleLoader;
 import org.pytorch.Module;
@@ -86,7 +92,7 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
     protected AnalysisResult analyzeImage(ImageProxy image, int rotationDegrees) {
         try {
             if (mModule == null) {
-                mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext(), "scripted101.ptl"));
+                mModule = LiteModuleLoader.load(ImageSegmentationActivity.assetFilePath(getApplicationContext(), "scripted101.ptl"));
             }
         } catch (IOException e) {
             Log.e("Object Detection", "Error reading assets", e);
