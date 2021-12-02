@@ -6,11 +6,6 @@
 
 package org.agriculture.vision.mscgnet.activities;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,6 +14,8 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,11 +27,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import org.agriculture.vision.mscgnet.R;
-import org.agriculture.vision.mscgnet.activities.object.detection.processing.PrePostProcessor;
-import org.agriculture.vision.mscgnet.activities.object.detection.processing.Result;
 import org.agriculture.vision.mscgnet.activities.object.detection.processing.ResultView;
-import org.pytorch.IValue;
 import org.pytorch.Module;
 import org.pytorch.Tensor;
 import org.pytorch.torchvision.TensorImageUtils;
@@ -44,8 +43,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Map;
 
 public class ImageSegmentationActivity extends AppCompatActivity implements Runnable {
     private static final String TAG = "MainActivity";
@@ -55,6 +52,8 @@ public class ImageSegmentationActivity extends AppCompatActivity implements Runn
     public static final String lutBasename = "lut.png";
 
     private Bitmap mBitmap = null;
+    private Bitmap lutRGB = null;
+    private Bitmap lutRGBOverlayedImage = null;
     private Module mModule = null;
     private static final int CLASSNUM = 10;
 
@@ -96,7 +95,7 @@ public class ImageSegmentationActivity extends AppCompatActivity implements Runn
 
     // need color code of labels
 
-    private String[] lutRGBImages = {
+    private final String[] lutRGBImages = {
             "mscg-samples/1E3FJWUF1_3911-3514-4423-4026" + "/" + lutRGBBasename,
             "mscg-samples/1FY8MBG8K_3050-1017-3562-1529" + "/" + lutRGBBasename,
             "mscg-samples/1FY8MBG8K_3645-665-4157-1177" + "/" + lutRGBBasename,
@@ -142,6 +141,7 @@ public class ImageSegmentationActivity extends AppCompatActivity implements Runn
     private Button mButtonDetect, mButtonSegment;
     private ProgressBar mProgressBar;
     private float mImgScaleX, mImgScaleY, mIvScaleX, mIvScaleY, mStartX, mStartY;
+
 
     public static String assetFilePath(Context context, String assetName) throws IOException {
         File file = new File(context.getFilesDir(), assetName);
@@ -248,13 +248,34 @@ public class ImageSegmentationActivity extends AppCompatActivity implements Runn
             @Override
             public void onClick(View view) {
                 mResultView.setVisibility(View.INVISIBLE);
+//                mProgressBar.setVisibility(ProgressBar.VISIBLE);
+//                mButtonSegment.setText(getString(R.string.run_model));
+
+                // TODO: refactor to be handled by ImageSegmentationVisualization class implementing Runnable
+
+
                 // apply post processing here
                 try {
-                    mBitmap = BitmapFactory.decodeStream(
+                    lutRGB = BitmapFactory.decodeStream(
+//                            getAssets().open(mLUTImages[mImageIndex])
+                            // access cached rendering of RGB rendering of model's LUT output
                             getAssets().open(lutRGBImages[mImageIndex])
                     );
-                    // display input image
-                    mImageView.setImageBitmap(mBitmap);
+                    // remove render
+                    Bitmap litRGBTransparent = null;
+//                    litRGBTransparent = createTransparentBitmapFromBitmap(lutRGB, 0xFF000000);
+//                    lutRGBOverlayedImage = overlay(mBitmap, lutRGB);
+
+                    // TODO: breaking rendering of segmentation
+//                    Thread thread = new Thread(ImageSegmentationActivity.this);
+//                    thread.start();
+
+                    // display cached RGB rendered segmentation
+//                    mImageView.setImageBitmap(lutRGBOverlayedImage);
+                    // show only lutRGB
+//                    mImageView.setImageBitmap(litRGBTransparent);
+                    mImageView.setImageBitmap(lutRGB);
+
                 } catch (IOException e) {
                     Log.e("Object Detection", "Error reading assets", e);
                     finish();
@@ -375,42 +396,69 @@ public class ImageSegmentationActivity extends AppCompatActivity implements Runn
 //    private static final int SHEEP = 17;
     @Override
     public void run() {
-        final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(mBitmap,
-                TensorImageUtils.TORCHVISION_NORM_MEAN_RGB, TensorImageUtils.TORCHVISION_NORM_STD_RGB);
-        final float[] inputs = inputTensor.getDataAsFloatArray(); // TODO: this should be the on-disk LUT image converted to tensor form
-
+//        final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(mBitmap,
+//                TensorImageUtils.TORCHVISION_NORM_MEAN_RGB, TensorImageUtils.TORCHVISION_NORM_STD_RGB);
+//        final float[] inputs = inputTensor.getDataAsFloatArray(); // TODO: this should be the on-disk LUT image converted to tensor form
+//
         final long startTime = SystemClock.elapsedRealtime();
-
-        // TODO: REST API inference would also be performed here via the served image at the endpoint
-        // TODO: update here for the associated demo input image to output LUT
-        Map<String, IValue> outTensors = mModule.forward(IValue.from(inputTensor)).toDictStringKey();
+//
+//        // TODO: REST API inference would also be performed here via the served image at the endpoint
+//        // TODO: update here for the associated demo input image to output LUT
+//        Map<String, IValue> outTensors = (Map<String, IValue>) inputTensor;
+//        outTensors =
 
         final long inferenceTime = SystemClock.elapsedRealtime() - startTime;
         Log.d("ImageSegmentation", "inference time (ms): " + inferenceTime);
 
-        final Tensor outputTensor = outTensors.get("out").toTensor();
+//        final Tensor outputTensor = outTensors.get("out").toTensor();
+        final Tensor outputTensor = TensorImageUtils.bitmapToFloat32Tensor(mBitmap,
+                TensorImageUtils.TORCHVISION_NORM_MEAN_RGB, TensorImageUtils.TORCHVISION_NORM_STD_RGB);
         final float[] scores = outputTensor.getDataAsFloatArray();
         int width = mBitmap.getWidth();
         int height = mBitmap.getHeight();
+        Log.d(TAG, String.valueOf(mBitmap.getColorSpace()));
+        Log.d(TAG, String.format("LUT Height: %d Width: %d", height, width));
         int[] intValues = new int[width * height];
 
         // apply coloring
         for (int j = 0; j < height; j++) {
             for (int k = 0; k < width; k++) {
 
-                int maxi = 0, maxj = 0, maxk = 0;
-                double maxnum = -Double.MAX_VALUE;
-
+//                int maxi = 0, maxj = 0, maxk = 0;
+//                double maxnum = -Integer.MAX_VALUE;
+//                double maxnum = -Double.MAX_VALUE;
 
                 for (int i = 0; i < CLASSNUM; i++) {
-                    float score = scores[i * (width * height) + j * width + k];
-                    if (score > maxnum) {
-                        maxnum = score;
-                        maxi = i;
-                        maxj = j;
-                        maxk = k;
-                    }
+                    Log.d(TAG, String.format("Pixel Value: %d", scores[j * k + i]));
+
                 }
+
+//                    float score = scores[i * (width * height) + j * width + k];
+//                    if (score > maxnum) {
+//                        maxnum = score;
+//                        maxi = i;
+//                        maxj = j;
+//                        maxk = k;
+//                    }
+//                    if (maxi == WATER)
+//                        intValues[maxj * width + maxk] = COLOR_MAP[maxi];
+//                    else if (maxi == DOUBLE_PLANT)
+//                        intValues[maxj * width + maxk] = COLOR_MAP[maxi];
+//                    else if (maxi == PLANTER_SKIP)
+//                        intValues[maxj * width ] = COLOR_MAP[maxi];
+//                    else if (maxi == DRYDOWN)
+//                        intValues[maxj * width ] = COLOR_MAP[maxi];
+//                    else if (maxi == WATERWAY)
+//                        intValues[maxj * width + maxk] = COLOR_MAP[maxi];
+//                    else if (maxi == WEED_CLUSTER)
+//                        intValues[maxj * width + maxk] = COLOR_MAP[maxi];
+//                    else if (maxi == ENDROW)
+//                        intValues[maxj * width + maxk] = COLOR_MAP[maxi];
+//                    else if (maxi == NUTRIENT_DEFICIENT)
+//                        intValues[maxj * width + maxk] = COLOR_MAP[maxi];
+//                    else if (maxi == STORM_DAMAGE)
+//                        intValues[maxj * width + maxk] = COLOR_MAP[maxi];
+//                }
 
                 // color code is in HEX ie 2-leftmost bits define MAX range
                 // FF = 255
@@ -422,24 +470,24 @@ public class ImageSegmentationActivity extends AppCompatActivity implements Runn
 
                 // interpret tensor as a 1D array where the  maxing pixel
                 // index will be mapped to the particular color code
-                if (maxi == WATER)
-                    intValues[maxj * width + maxk] = COLOR_MAP[maxi];
-                else if (maxi == DOUBLE_PLANT)
-                    intValues[maxj * width + maxk] = COLOR_MAP[maxi];
-                else if (maxi == PLANTER_SKIP)
-                    intValues[maxj * width + maxk] = COLOR_MAP[maxi];
-                else if (maxi == DRYDOWN)
-                    intValues[maxj * width + maxk] = COLOR_MAP[maxi];
-                else if (maxi == WATERWAY)
-                    intValues[maxj * width + maxk] = COLOR_MAP[maxi];
-                else if (maxi == WEED_CLUSTER)
-                    intValues[maxj * width + maxk] = COLOR_MAP[maxi];
-                else if (maxi == ENDROW)
-                    intValues[maxj * width + maxk] = COLOR_MAP[maxi];
-                else if (maxi == NUTRIENT_DEFICIENT)
-                    intValues[maxj * width + maxk] = COLOR_MAP[maxi];
-                else if (maxi == STORM_DAMAGE)
-                    intValues[maxj * width + maxk] = COLOR_MAP[maxi];
+//                if (maxi == WATER)
+//                    intValues[maxj * width + maxk] = COLOR_MAP[maxi];
+//                else if (maxi == DOUBLE_PLANT)
+//                    intValues[maxj * width + maxk] = COLOR_MAP[maxi];
+//                else if (maxi == PLANTER_SKIP)
+//                    intValues[maxj * width ] = COLOR_MAP[maxi];
+//                else if (maxi == DRYDOWN)
+//                    intValues[maxj * width + maxk] = COLOR_MAP[maxi];
+//                else if (maxi == WATERWAY)
+//                    intValues[maxj * width + maxk] = COLOR_MAP[maxi];
+//                else if (maxi == WEED_CLUSTER)
+//                    intValues[maxj * width + maxk] = COLOR_MAP[maxi];
+//                else if (maxi == ENDROW)
+//                    intValues[maxj * width + maxk] = COLOR_MAP[maxi];
+//                else if (maxi == NUTRIENT_DEFICIENT)
+//                    intValues[maxj * width + maxk] = COLOR_MAP[maxi];
+//                else if (maxi == STORM_DAMAGE)
+//                    intValues[maxj * width + maxk] = COLOR_MAP[maxi];
             }
         }
 
@@ -452,11 +500,68 @@ public class ImageSegmentationActivity extends AppCompatActivity implements Runn
             @Override
             public void run() {
                 mImageView.setImageBitmap(transferredBitmap);
-                mButtonSegment.setEnabled(true);
-                mButtonSegment.setText(getString(R.string.segment));
-                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+//                mButtonSegment.setEnabled(true);
+//                mButtonSegment.setText(getString(R.string.segment));
+//                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
 
             }
         });
     }
+
+    public static Bitmap createTransparentBitmapFromBitmap(Bitmap bitmap,
+                                                           int replaceThisColor) {
+        if (bitmap != null) {
+            int picw = bitmap.getWidth();
+            int pich = bitmap.getHeight();
+            int[] pix = new int[picw * pich];
+            bitmap.getPixels(pix, 0, picw, 0, 0, picw, pich);
+
+            for (int y = 0; y < pich; y++) {
+                // from left to right
+                for (int x = 0; x < picw; x++) {
+                    int index = y * picw + x;
+                    int r = (pix[index] >> 16) & 0xff;
+                    int g = (pix[index] >> 8) & 0xff;
+                    int b = pix[index] & 0xff;
+
+                    if (pix[index] == replaceThisColor) {
+                        pix[index] = Color.TRANSPARENT;
+                    } else {
+                        break;
+                    }
+                }
+
+                // from right to left
+                for (int x = picw - 1; x >= 0; x--) {
+                    int index = y * picw + x;
+                    int r = (pix[index] >> 16) & 0xff;
+                    int g = (pix[index] >> 8) & 0xff;
+                    int b = pix[index] & 0xff;
+
+                    if (pix[index] == replaceThisColor) {
+                        pix[index] = Color.TRANSPARENT;
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            Bitmap bm = Bitmap.createBitmap(pix, picw, pich,
+                    Bitmap.Config.ARGB_4444);
+
+            return bm;
+        }
+        return null;
+    }
+
+    public static Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
+        Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
+        Canvas canvas = new Canvas(bmOverlay);
+        canvas.drawBitmap(bmp1, new Matrix(), null);
+        canvas.drawBitmap(bmp2, 0, 0, null);
+        bmp1.recycle();
+        bmp2.recycle();
+        return bmOverlay;
+    }
+
 }
