@@ -296,11 +296,11 @@ public class ImageSegmentationActivity extends AppCompatActivity implements Runn
                             getAssets().open(lutRGBImages[mImageIndex])
                     );
                     // LUT only
-                    if (overlayMode == 0) {
+                    if (overlayMode == 1) {
                         mImageView.setImageBitmap(lutRGB);
                     }
                     // LUT to black-rm LUT + input image
-                    else if (overlayMode == 1) {
+                    else if (overlayMode == 0) {
                         // remove black
                         Bitmap litRGBTransparent = null;
                         litRGBTransparent = createTransparentBitmapFromBitmap(lutRGB, 0xFF000000);
