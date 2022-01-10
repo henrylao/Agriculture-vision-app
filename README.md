@@ -5,6 +5,9 @@ Group 2:
 * Pradeep Gummidipundi
 * Atiya Kailany
 * Henry Lao
+# Demo
+
+![](https://github.com/manishkakarla/Agriculture-vision-app/blob/master/mscg-demo.gif)
 # Table of contents
 * [Section 1: Installation](https://github.com/manishkakarla/Agriculture-vision-app/wiki#section-1---execution-instructions)
 * [Section 2: Project Files Overview](https://github.com/manishkakarla/Agriculture-vision-app/wiki#section-2-code-description)
@@ -35,7 +38,6 @@ screenshot of android app assests folder
 
 * After opening the app in Android Studio, select a suitable emulator or Android device connected to your local machine, and hit Run.
 
-![](https://github.com/manishkakarla/Agriculture-vision-app/blob/master/mscg-demo.gif)
 
 ***
 
